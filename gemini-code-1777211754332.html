@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watering System Switch</title>
+    <style>
+        /* Menggunakan font premium dari Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            /* Background gelap yang elegan */
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Desain Card Glassmorphism */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 50px 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        h1 {
+            font-weight: 600;
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        /* Desain Tombol Utama */
+        .switch-btn {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            outline: none;
+        }
+
+        /* State: OFF */
+        .switch-btn.off {
+            background: #334155;
+            color: #64748b;
+            box-shadow: 
+                inset 8px 8px 16px rgba(0,0,0,0.4), 
+                inset -8px -8px 16px rgba(255,255,255,0.05),
+                0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .switch-btn.off:hover {
+            transform: scale(1.05);
+            background: #3b4b63;
+        }
+
+        /* State: ON (Menyala dengan efek glow) */
+        .switch-btn.on {
+            background: #10b981;
+            color: white;
+            box-shadow: 
+                0 0 30px rgba(16, 185, 129, 0.6), 
+                inset 4px 4px 10px rgba(255,255,255,0.3),
+                inset -4px -4px 10px rgba(0,0,0,0.2);
+            transform: scale(1.05);
+        }
+
+        .status-container {
+            margin-top: 40px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.2);
+            display: inline-block;
+        }
+
+        .status-text {
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .status-text.on { color: #34d399; }
+        .status-text.off { color: #f87171; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>Watering System</h1>
+        <p>Smart Control Panel</p>
+        
+        <button id="toggleBtn" class="switch-btn off">OFF</button>
+        
+        <div class="status-container">
+            <div id="statusText" class="status-text off">KONEKSI...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase dari CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        //  PENTING: Ganti dengan konfigurasi Firebase kamu 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAes_0cn-mkmgxCdYGObX5knasM3Gs5WO4",
+            authDomain: "arduino-kokulikuler.firebaseapp.com",
+            databaseURL: "https://arduino-kokulikuler-default-rtdb.asia-southeast1.firebasedatabase.app", // Pastikan URL ini benar
+            projectId: "arduino-kokulikuler",
+            storageBucket: "arduino-kokulikuler.firebasestorage.app",
+            messagingSenderId: "551582689767",
+            appId: "1:551582689767:web:1aa9210339b4f0cbc6b542"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // Targetkan lokasi data di Realtime Database 
+        // (Ubah 'pompa/status' sesuai dengan path yang dibaca oleh ESP32 atau mikrokontrolermu)
+        const pumpRef = ref(db, 'pompa/status'); 
+
+        const toggleBtn = document.getElementById('toggleBtn');
+        const statusText = document.getElementById('statusText');
+        let currentStatus = "OFF";
+
+        // Membaca data dari Firebase secara Realtime
+        onValue(pumpRef, (snapshot) => {
+            const data = snapshot.val();
+            if(data !== null) {
+                currentStatus = data;
+                updateUI(currentStatus);
+            }
+        });
+
+        // Event saat tombol ditekan (Mengirim data ke Firebase)
+        toggleBtn.addEventListener('click', () => {
+            // Animasi loading kecil sebelum database terupdate
+            statusText.innerText = "MENGIRIM..."; 
+            
+            // Ubah ON jadi OFF, atau OFF jadi ON
+            const newStatus = currentStatus === "ON" ? "OFF" : "ON";
+            
+            // Simpan nilai baru ke Firebase
+            set(pumpRef, newStatus)
+                .catch((error) => {
+                    console.error("Gagal mengubah data:", error);
+                    alert("Gagal terhubung ke Firebase!");
+                });
+        });
+
+        // Fungsi untuk mengubah tampilan sesuai status
+        function updateUI(status) {
+            if (status === "ON") {
+                toggleBtn.className = "switch-btn on";
+                toggleBtn.innerText = "ON";
+                statusText.className = "status-text on";
+                statusText.innerText = "SISTEM AKTIF";
+            } else {
+                toggleBtn.className = "switch-btn off";
+                toggleBtn.innerText = "OFF";
+                statusText.className = "status-text off";
+                statusText.innerText = "SISTEM MATI";
+            }
+        }
+    </script>
+</body>
+</html>

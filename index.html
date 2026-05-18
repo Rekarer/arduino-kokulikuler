@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watering System Switch</title>
     <style>
-        /* Menggunakan font premium dari Google Fonts */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
         * {
@@ -16,7 +15,6 @@
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            /* Background gelap yang elegan */
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
             display: flex;
@@ -25,7 +23,6 @@
             height: 100vh;
         }
 
-        /* Desain Card Glassmorphism */
         .card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -53,7 +50,6 @@
             font-weight: 300;
         }
 
-        /* Desain Tombol Utama */
         .switch-btn {
             width: 140px;
             height: 140px;
@@ -71,7 +67,18 @@
             outline: none;
         }
 
-        /* State: OFF */
+        /* TOMBOL ON = POMPA OFF */
+        .switch-btn.on {
+            background: #10b981;
+            color: white;
+            box-shadow: 
+                0 0 30px rgba(16, 185, 129, 0.6), 
+                inset 4px 4px 10px rgba(255,255,255,0.3),
+                inset -4px -4px 10px rgba(0,0,0,0.2);
+            transform: scale(1.05);
+        }
+
+        /* TOMBOL OFF = POMPA ON */
         .switch-btn.off {
             background: #334155;
             color: #64748b;
@@ -81,20 +88,9 @@
                 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .switch-btn.off:hover {
-            transform: scale(1.05);
-            background: #3b4b63;
-        }
-
-        /* State: ON (Menyala dengan efek glow) */
-        .switch-btn.on {
-            background: #10b981;
-            color: white;
-            box-shadow: 
-                0 0 30px rgba(16, 185, 129, 0.6), 
-                inset 4px 4px 10px rgba(255,255,255,0.3),
-                inset -4px -4px 10px rgba(0,0,0,0.2);
-            transform: scale(1.05);
+        .switch-btn.off:hover,
+        .switch-btn.on:hover {
+            transform: scale(1.08);
         }
 
         .status-container {
@@ -130,51 +126,53 @@
     </div>
 
     <script type="module">
-        // Import Firebase dari CDN
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        //  PENTING: Ganti dengan konfigurasi Firebase kamu 
         const firebaseConfig = {
             apiKey: "AIzaSyAes_0cn-mkmgxCdYGObX5knasM3Gs5WO4",
             authDomain: "arduino-kokulikuler.firebaseapp.com",
-            databaseURL: "https://arduino-kokulikuler-default-rtdb.asia-southeast1.firebasedatabase.app", // Pastikan URL ini benar
+            databaseURL: "https://arduino-kokulikuler-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "arduino-kokulikuler",
             storageBucket: "arduino-kokulikuler.firebasestorage.app",
             messagingSenderId: "551582689767",
             appId: "1:551582689767:web:1aa9210339b4f0cbc6b542"
         };
 
-        // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        // Targetkan lokasi data di Realtime Database 
-        // (Ubah 'pompa/status' sesuai dengan path yang dibaca oleh ESP32 atau mikrokontrolermu)
+
         const pumpRef = ref(db, 'pompa_status'); 
 
         const toggleBtn = document.getElementById('toggleBtn');
         const statusText = document.getElementById('statusText');
+
         let currentStatus = "OFF";
 
-        // Membaca data dari Firebase secara Realtime
+        /* SOUND EFFECT */
+        const clickSound = new Audio("https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3");
+
+        // Realtime Firebase listener
         onValue(pumpRef, (snapshot) => {
             const data = snapshot.val();
+
             if(data !== null) {
                 currentStatus = data;
                 updateUI(currentStatus);
             }
         });
 
-        // Event saat tombol ditekan (Mengirim data ke Firebase)
+        // Tombol ditekan
         toggleBtn.addEventListener('click', () => {
-            // Animasi loading kecil sebelum database terupdate
+
+            clickSound.currentTime = 0;
+            clickSound.play();
+
             statusText.innerText = "MENGIRIM..."; 
-            
-            // Ubah ON jadi OFF, atau OFF jadi ON
+
             const newStatus = currentStatus === "ON" ? "OFF" : "ON";
-            
-            // Simpan nilai baru ke Firebase
+
             set(pumpRef, newStatus)
                 .catch((error) => {
                     console.error("Gagal mengubah data:", error);
@@ -182,20 +180,36 @@
                 });
         });
 
-        // Fungsi untuk mengubah tampilan sesuai status
+        // LOGIKA DIBALIK:
+        // ON = Pompa OFF
+        // OFF = Pompa ON
+
         function updateUI(status) {
+
             if (status === "ON") {
+
+                // UI bilang ON
+                // Tapi sebenarnya pompa MATI
+
                 toggleBtn.className = "switch-btn on";
                 toggleBtn.innerText = "ON";
+
                 statusText.className = "status-text on";
-                statusText.innerText = "SISTEM AKTIF";
+                statusText.innerText = "POMPA OFF";
+
             } else {
+
+                // UI bilang OFF
+                // Tapi sebenarnya pompa NYALA
+
                 toggleBtn.className = "switch-btn off";
                 toggleBtn.innerText = "OFF";
+
                 statusText.className = "status-text off";
-                statusText.innerText = "SISTEM MATI";
+                statusText.innerText = "POMPA ON";
             }
         }
+
     </script>
 </body>
 </html>

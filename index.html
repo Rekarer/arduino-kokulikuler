@@ -3,122 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Watering System Switch</title>
+    <title>Watering Dashboard</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-        * { box-sizing: border-box; }
+        :root {
+            --bg-main: #0b0f19;
+            --bg-card: #131926;
+            --border-color: #1e293b;
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 20px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            padding: 50px 40px;
-            border-radius: 30px;
-            text-align: center;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .dashboard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 32px;
+            border-radius: 24px;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        h1 {
-            font-weight: 600;
-            margin: 0 0 5px 0;
-            font-size: 24px;
-            letter-spacing: 1px;
+        /* Header Style */
+        .header {
+            margin-bottom: 32px;
         }
 
-        p {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 40px;
-            font-weight: 300;
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
         }
 
-        .switch-btn {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .header p {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* Control Section */
+        .control-section {
             display: flex;
-            justify-content: center;
             align-items: center;
-            margin: 0 auto;
-            outline: none;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
         }
 
-        .switch-btn.off {
-            background: #334155;
-            color: #64748b;
-            box-shadow: 
-                inset 8px 8px 16px rgba(0,0,0,0.4), 
-                inset -8px -8px 16px rgba(255,255,255,0.05),
-                0 10px 20px rgba(0,0,0,0.2);
+        .control-info h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
 
-        .switch-btn.off:hover {
-            transform: scale(1.05);
-            background: #3b4b63;
-        }
-
-        .switch-btn.on {
-            background: #10b981;
-            color: white;
-            box-shadow: 
-                0 0 30px rgba(16, 185, 129, 0.6), 
-                inset 4px 4px 10px rgba(255,255,255,0.3),
-                inset -4px -4px 10px rgba(0,0,0,0.2);
-            transform: scale(1.05);
-        }
-
-        .status-container {
-            margin-top: 40px;
-            padding: 10px 20px;
-            border-radius: 20px;
-            background: rgba(0,0,0,0.2);
-            display: inline-block;
-        }
-
-        .status-text {
-            font-size: 14px;
-            font-weight: 400;
-            letter-spacing: 1px;
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+        }
+        .status-badge.on { color: var(--accent-green); }
+        .status-badge.off { color: var(--accent-red); }
+
+        /* Sleek Modern Switch */
+        .power-switch {
+            position: relative;
+            width: 72px;
+            height: 40px;
+            appearance: none;
+            background: #1e293b;
+            border-radius: 20px;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            border: 1px solid var(--border-color);
         }
 
-        .status-text.on { color: #34d399; }
-        .status-text.off { color: #f87171; }
+        .power-switch::before {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            background: #64748b;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+        }
+
+        .power-switch:checked {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .power-switch:checked::before {
+            transform: translateX(32px);
+            background: var(--accent-green);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Interval Section */
+        .interval-section {
+            border-top: 1px dashed var(--border-color);
+            padding-top: 24px;
+        }
+
+        .interval-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .interval-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .interval-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            padding: 14px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .interval-btn:hover {
+            background: rgba(255,255,255,0.02);
+            border-color: #334155;
+        }
+
+        .interval-btn.active {
+            background: var(--text-light);
+            color: var(--bg-main);
+            border-color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Feedback Toast/Indicator */
+        .footer-note {
+            margin-top: 24px;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Watering System</h1>
-        <p>Smart Control Panel</p>
-        
-        <button id="toggleBtn" class="switch-btn off">OFF</button>
-        
-        <div class="status-container">
-            <div id="statusText" class="status-text off">KONEKSI...</div>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Watering System</h1>
+            <p>Node ID: arduino-kokulikuler</p>
         </div>
+        
+        <div class="control-section">
+            <div class="control-info">
+                <h3>Manual Control</h3>
+                <div id="statusText" class="status-badge off">Menghubungkan...</div>
+            </div>
+            <input type="checkbox" id="toggleSwitch" class="power-switch">
+        </div>
+        
+        <div class="interval-section">
+            <span class="interval-label">Automated Interval</span>
+            <div class="interval-grid">
+                <button class="interval-btn" data-hours="0">Matikan Timer</button>
+                <button class="interval-btn" data-hours="12">Setiap 12 Jam</button>
+                <button class="interval-btn" data-hours="24">1 Hari Sekali</button>
+                <button class="interval-btn" data-hours="48">2 Hari Sekali</button>
+            </div>
+        </div>
+
+        <div class="footer-note" id="syncStatus">Sistem sinkron dengan cloud</div>
     </div>
 
     <script type="module">
@@ -137,168 +228,118 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
+        // References ke Firebase
         const pumpRef = ref(db, 'pompa_status'); 
+        const intervalRef = ref(db, 'pompa_interval'); // Path baru untuk menyimpan data interval (dalam hitungan jam)
 
-        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleSwitch = document.getElementById('toggleSwitch');
         const statusText = document.getElementById('statusText');
+        const syncStatus = document.getElementById('syncStatus');
+        const intervalButtons = document.querySelectorAll('.interval-btn');
         
-        // Variabel untuk menyimpan nilai dari Firebase (raw value)
-        let currentRawValue = "OFF";
-        
-        // Sound effect (sama seperti desain awal, menggunakan beep)
         const clickSound = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-        // Preload sound agar responsif
-        clickSound.load();
-        
-        // Fungsi untuk memainkan suara dan getaran sesuai aksi
-        function playFeedback(action) {
-            // action: "on" untuk menyalakan pompa, "off" untuk mematikan pompa
-            try {
-                // Clone audio agar bisa diputar berkali-kali tanpa delay
-                const soundClone = clickSound.cloneNode();
-                soundClone.volume = 0.5;
-                soundClone.play().catch(e => console.log("Audio play error:", e));
-            } catch(e) {}
-            
-            // Fitur getaran (haptic)
+        clickSound.volume = 0.3;
+
+        function triggerHaptic(type) {
             if (navigator.vibrate) {
-                if (action === "on") {
-                    // Getaran pendek untuk menyalakan
-                    navigator.vibrate(80);
-                } else {
-                    // Getaran dua kali untuk mematikan
-                    navigator.vibrate([60, 40, 60]);
-                }
+                type === 'on' ? navigator.vibrate(40) : navigator.vibrate([40, 30, 40]);
             }
         }
-        
-        // ========== LOGIKA TERBALIK ==========
-        // Karena kode Arduino salah (misal: saat menerima "OFF" justru menyalakan pompa, 
-        // dan "ON" mematikan pompa), maka website perlu membalik logika.
-        //
-        // Penjelasan:
-        // - Jika USER ingin POMPA NYALA (fisik menyala) -> tombol harus tampil "ON", 
-        //   dan kita KIRIM "OFF" ke Firebase (karena Arduino salah).
-        // - Jika USER ingin POMPA MATI (fisik mati) -> tombol tampil "OFF", 
-        //   dan kita KIRIM "ON" ke Firebase.
-        //
-        // Saat membaca dari Firebase (nilai mentah):
-        // - Jika database berisi "OFF" (mentah) -> seharusnya pompa fisik NYALA, 
-        //   jadi UI menampilkan status "POMPA NYALA" dan tombol "ON".
-        // - Jika database berisi "ON" (mentah) -> pompa fisik MATI, 
-        //   UI menampilkan "POMPA MATI" dan tombol "OFF".
+
         // =====================================
-        
+        // LOGIKA REVERSE UNTUK POMPA MANUAL
+        // =====================================
         function updateUIFromDatabase(rawValue) {
-            // rawValue: nilai dari Firebase ('ON' atau 'OFF')
-            let isPumpPhysicalOn = false;
+            let isPumpPhysicalOn = (rawValue === "OFF"); // REVERSE LOGIC
             
-            if (rawValue === "OFF") {
-                // OFF di database = pompa fisik NYALA (karena kesalahan Arduino)
-                isPumpPhysicalOn = true;
-            } else if (rawValue === "ON") {
-                // ON di database = pompa fisik MATI
-                isPumpPhysicalOn = false;
-            }
+            toggleSwitch.checked = isPumpPhysicalOn;
             
-            // Update tampilan tombol dan status text berdasarkan kondisi fisik pompa
             if (isPumpPhysicalOn) {
-                // Pompa menyala -> tampilkan tombol ON, status POMPA NYALA
-                toggleBtn.className = "switch-btn on";
-                toggleBtn.innerText = "ON";
-                statusText.className = "status-text on";
-                statusText.innerText = "POMPA NYALA";
+                statusText.className = "status-badge on";
+                statusText.innerText = "Pompa Aktif";
             } else {
-                // Pompa mati -> tampilkan tombol OFF, status POMPA MATI
-                toggleBtn.className = "switch-btn off";
-                toggleBtn.innerText = "OFF";
-                statusText.className = "status-text off";
-                statusText.innerText = "POMPA MATI";
+                statusText.className = "status-badge off";
+                statusText.innerText = "Pompa Mati";
             }
         }
-        
-        // Fungsi untuk mengirim nilai ke Firebase (dengan logika terbalik)
-        function sendCommand(userWantsPumpOn) {
-            // userWantsPumpOn: true = user ingin menyalakan pompa, false = ingin mematikan
-            let valueToSend;
-            if (userWantsPumpOn) {
-                // Ingin menyalakan pompa -> kirim "OFF" (karena Arduino salah)
-                valueToSend = "OFF";
-            } else {
-                // Ingin mematikan pompa -> kirim "ON" (karena Arduino salah)
-                valueToSend = "ON";
-            }
+
+        toggleSwitch.addEventListener('change', () => {
+            const userWantsPumpOn = toggleSwitch.checked;
+            const valueToSend = userWantsPumpOn ? "OFF" : "ON"; // REVERSE LOGIC
             
-            // Tampilkan feedback "MENGIRIM..."
-            statusText.innerText = "MENGIRIM...";
-            toggleBtn.style.opacity = "0.7";
+            syncStatus.innerText = "Memperbarui cloud...";
             
-            // Kirim ke Firebase
             set(pumpRef, valueToSend)
                 .then(() => {
-                    // Sukses, play feedback sesuai aksi yang diminta user
-                    playFeedback(userWantsPumpOn ? "on" : "off");
+                    triggerHaptic(userWantsPumpOn ? 'on' : 'off');
+                    try { clickSound.play(); } catch(e){}
+                    syncStatus.innerText = "Perubahan tersimpan";
                 })
                 .catch((error) => {
-                    console.error("Gagal mengubah data:", error);
-                    statusText.innerText = "GAGAL!";
-                    toggleBtn.style.opacity = "1";
-                    setTimeout(() => {
-                        // Refresh UI dengan nilai terbaru dari database
-                        onValue(pumpRef, (snap) => {
-                            if (snap.exists()) updateUIFromDatabase(snap.val());
-                        }, { onlyOnce: true });
-                    }, 1000);
+                    console.error(error);
+                    syncStatus.innerText = "Gagal memperbarui!";
+                    toggleSwitch.checked = !userWantsPumpOn; // Revert UI jika gagal
                 });
-        }
-        
-        // Event listener tombol klik
-        toggleBtn.addEventListener('click', () => {
-            // Cek kondisi tombol saat ini (berdasarkan class)
-            const isCurrentlyOn = toggleBtn.classList.contains("on");
-            
-            // Jika tombol saat ini "ON" (artinya pompa fisik sedang menyala), 
-            // user ingin mematikan -> userWantsPumpOn = false
-            // Jika tombol saat ini "OFF" (pompa fisik mati), user ingin menyalakan -> userWantsPumpOn = true
-            const userWantsPumpOn = !isCurrentlyOn;
-            
-            // Kirim perintah dengan logika terbalik
-            sendCommand(userWantsPumpOn);
         });
-        
-        // Listener realtime dari Firebase
+
+        // Dengarkan status pompa secara Realtime
         onValue(pumpRef, (snapshot) => {
             const data = snapshot.val();
-            if (data !== null && (data === "ON" || data === "OFF")) {
-                currentRawValue = data;
-                updateUIFromDatabase(currentRawValue);
-            } else if (data === null) {
-                // Jika data belum ada, inisialisasi dengan nilai yang aman
-                // Pilih default: pompa dalam keadaan mati (fisik mati) -> kirim "ON" ke database
-                console.log("Data kosong, inisialisasi dengan 'ON' (pompa mati fisik)");
-                set(pumpRef, "ON").catch(e => console.warn(e));
-                statusText.innerText = "INIT...";
+            if (data === "ON" || data === "OFF") {
+                updateUIFromDatabase(data);
+                syncStatus.innerText = "Sistem sinkron dengan cloud";
+            } else {
+                set(pumpRef, "ON"); // Default mati secara fisik
             }
-        }, (error) => {
-            console.error("Gagal mendengar perubahan:", error);
-            statusText.innerText = "ERROR";
         });
-        
-        // Efek sentuhan mikro (opsional, tetap menjaga desain)
-        toggleBtn.addEventListener('touchstart', () => {
-            toggleBtn.style.transform = "scale(0.96)";
+
+
+        // =====================================
+        // LOGIKA MENU INTERVAL (BARU)
+        // =====================================
+        // Klik Handler untuk tombol interval
+        intervalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const hours = parseInt(button.getAttribute('data-hours'));
+                
+                syncStatus.innerText = "Mengatur interval...";
+                
+                // Menyimpan nilai interval (jam) ke Firebase. 
+                // Di sisi Arduino, baca nilai 'pompa_interval' ini untuk logika millis() / RTC Anda.
+                set(intervalRef, hours)
+                    .then(() => {
+                        if(navigator.vibrate) navigator.vibrate(50);
+                        syncStatus.innerText = "Interval diperbarui";
+                    })
+                    .catch(err => {
+                        syncStatus.innerText = "Gagal mengatur interval";
+                        console.error(err);
+                    });
+            });
         });
-        toggleBtn.addEventListener('touchend', () => {
-            toggleBtn.style.transform = "";
+
+        // Dengarkan status interval secara Realtime dari Firebase agar UI tombol sinkron
+        onValue(intervalRef, (snapshot) => {
+            const currentInterval = snapshot.val();
+            
+            // Hapus class active di semua tombol terlebih dahulu
+            intervalButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Cari tombol yang sesuai dengan nilai di firebase dan beri class active
+            let matched = false;
+            intervalButtons.forEach(btn => {
+                if (parseInt(btn.getAttribute('data-hours')) === currentInterval) {
+                    btn.classList.add('active');
+                    matched = true;
+                }
+            });
+            
+            // Jika tidak ada nilai atau tidak match, default ke "Matikan Timer" (0)
+            if (!matched && currentInterval === null) {
+                set(intervalRef, 0);
+            }
         });
-        toggleBtn.addEventListener('mousedown', () => {
-            toggleBtn.style.transform = "scale(0.96)";
-        });
-        toggleBtn.addEventListener('mouseup', () => {
-            toggleBtn.style.transform = "";
-        });
-        
-        console.log("✅ REVERSE LOGIC ACTIVE: Tombol ON = Pompa NYALA (kirim OFF ke DB) | Tombol OFF = Pompa MATI (kirim ON ke DB)");
     </script>
 </body>
 </html>
